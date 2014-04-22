@@ -7,18 +7,18 @@ This is a simple pipeline to automate the processing of cancer samples downstrea
 
 The steps are as follows:
 
-1. Annotation
+- Annotation
 
 Filter variants according to coverage/allelfreq cutoffs.
 Annotate variants with Annovar and SNPeff.
 Transform sample vcfs into mafs.
 Unite all samples into a common output maf/vcf.
 
-2. MuSiC
+- MuSiC
 
 Prepare input files for MuSiC (i.e. intersection of samples available as bam and samples in the united maf).
 Run all MuSiC tools sequentially.
 
-3. MutSigCV
+- MutSigCV
 
 Run MutSigCV on the united maf.
