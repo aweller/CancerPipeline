@@ -1,9 +1,8 @@
 cancer_pipeline
 ===============
 
-The ruffus pipeline from a bunch of vcfs to annotation and downstream analysis in MuSiC and MutSigCV.
-
 This is a simple pipeline to automate the processing of cancer samples downstream of variant calling. 
+File locations and settings are saved as a Python dictionary in pipeline_config.py.
 
 The steps are as follows:
 
