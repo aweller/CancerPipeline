@@ -24,6 +24,7 @@ class VCFrow():
         self.fields = row.split("\t")
         
         self.values = collections.OrderedDict()
+        self.chrompos = None
         
         if not row[0] == "#":
         

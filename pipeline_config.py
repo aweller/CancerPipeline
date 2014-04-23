@@ -26,6 +26,16 @@ config = {"test_Quasar_A1_VC1_VF01":
                     blacklist = "/home/andreas/bioinfo/projects/wtc_quasar_pipeline/data/vcfs_A1_VC1_VF00/deaminated_samples.txt",
                     max_snv = 50,
                     min_cov = 400,
-                    min_varfreq = 0.05)
-              
+                    min_varfreq = 0.05),
+            
+            "Quasar_A1_VC1_VF02":   
+            dict(root = "/home/andreas/bioinfo/projects/wtc_quasar_pipeline/data/",
+                    raw_vcf_folder = "/home/andreas/bioinfo/projects/wtc_quasar_pipeline/data/vcfs_A1_VC1_VF00/",
+                    bam_folder = "/home/andreas/bioinfo/projects/wtc_quasar_analysis/data/quasar_bams/",
+                    bed = "/home/andreas/bioinfo/projects/wtc_quasar_pipeline/data/core/roi_148gene_panel_HP.bed",
+                    ref = "/home/andreas/bioinfo/core/general/data/hg19.fasta",
+                    whitelist = "/home/andreas/bioinfo/projects/wtc_quasar_pipeline/data/test_whitelist_134.txt",
+                    max_snv = 50,
+                    min_cov = 400,
+                    min_varfreq = 0.05)              
 }

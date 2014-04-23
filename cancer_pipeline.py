@@ -11,12 +11,12 @@ import pipeline_config as config
 import pprint
 import shutil
 import logging
+import re
 
 # TODO
-# - implement a fast elegant way that filters the vcfs and then creates maf from the old mafs.
+# - fix the TODO related to not having "_v1" in the current bam names 
 # - SQL integration
 # - proper debugging output
-# - use sortedDict in the annotated output
 
 #configure logging 
 logging.basicConfig(level=logging.DEBUG,
@@ -82,43 +82,46 @@ raw_vcfs = [config["raw_vcf_folder"]+x for x in os.listdir(config["raw_vcf_folde
                   "anno" not in x]
 
 if config.get("blacklist"):
-    raw_vcfs = [x for x in raw_vcfs if x not in config.get("blacklist")]
+    blacklist = [x.strip() for x in open(config.get("blacklist")).readlines()]
+    raw_vcfs = [x for x in raw_vcfs if re.sub("_v[1-9]", "", x.split("/")[-1]) in blacklist] #TODO: remove the sub once the bam names are fixed
+if config.get("whitelist"):
+    whitelist = [x.strip() for x in open(config.get("whitelist")).readlines()]
+    raw_vcfs = [x for x in raw_vcfs if re.sub("_v[1-9]", "", x.split("/")[-1]) in whitelist] #TODO: remove the sub once the bam names are fixed
 
 logging.debug("Found %s raw input files:" % len(raw_vcfs))
-logging.debug(raw_vcfs)
+logging.debug(raw_vcfs)[:5]
 
-#all_maf_name = config["raw_vcf_folder"] + "all_samples_%s_S%s.maf" % (config["name"], len(raw_vcfs))
-#all_annotated_name = config["raw_vcf_folder"] + "all_samples_%s_S%s.tsv" % (config["name"], len(raw_vcfs))
-#
-#@transform(raw_vcfs, suffix(".vcf"), "_annotated.tsv")
-#def annotate_raw_vcfs(infile, outfile):
-#    sample = SA.SampleAnnotation(infile, target_folder= "", run_tools=True)
-#    sample.print_rows()
-#
-#@follows(annotate_raw_vcfs)
-#@merge(annotate_raw_vcfs, all_annotated_name)
-#def unite_annotated_raw_vcfs(samples, output):
-#    SA.annotate_all_samples_as_one(filenames=samples, outfile=all_annotated_name)
-#
-############################################################
-## VCF2MAF for unfiltered vcfs
-#
-#@transform(raw_vcfs, suffix(".vcf"), ".maf")
-#def transform_raw_vcfs_to_mafs(infile, outfile):
-#    vcf2maf.run_vcf2maf(infile)
-#
-#@follows(transform_raw_vcfs_to_mafs)
-#@merge(transform_raw_vcfs_to_mafs, all_maf_name)
-#def unite_mafs(samples, output):
-#    vcf2maf.unite_mafs(samples, output)
+all_maf_name = config["raw_vcf_folder"] + "all_samples_%s_S%s.maf" % (config["name"], len(raw_vcfs))
+all_annotated_name = config["raw_vcf_folder"] + "all_samples_%s_S%s.tsv" % (config["name"], len(raw_vcfs))
+
+@transform(raw_vcfs, suffix(".vcf"), "_annotated.tsv")
+def annotate_raw_vcfs(infile, outfile):
+    sample = SA.SampleAnnotation(infile, target_folder= "", run_tools=True)
+    sample.print_rows()
+
+@follows(annotate_raw_vcfs)
+@merge(annotate_raw_vcfs, all_annotated_name)
+def unite_annotated_raw_vcfs(samples, output):
+    SA.annotate_all_samples_as_one(filenames=samples, outfile=all_annotated_name)
+
+###########################################################
+# VCF2MAF for unfiltered vcfs
+
+@transform(raw_vcfs, suffix(".vcf"), ".maf")
+def transform_raw_vcfs_to_mafs(infile, outfile):
+    vcf2maf.run_vcf2maf(infile)
+
+@follows(transform_raw_vcfs_to_mafs)
+@merge(transform_raw_vcfs_to_mafs, all_maf_name)
+def unite_mafs(samples, output):
+    vcf2maf.unite_mafs(samples, output)
 
 ########################################################################################
 # Filter the raw vcfs ##################################################################
 ########################################################################################
 
-#@follows(unite_annotated_raw_vcfs)
-#@follows(unite_mafs, mkdir(config["vcf_folder"]))
-
+@follows(unite_annotated_raw_vcfs)
+@follows(unite_mafs, mkdir(config["vcf_folder"]))
 @transform(raw_vcfs, regex(r'.+\/(.+)'), r"%s\1" % config["vcf_folder"], config["vcf_folder"], int(config["max_snv"]), int(config["min_cov"]), float(config["min_varfreq"]))
 def filter_vcf(infile, outfile, outdir, max_snv, min_cov, min_varfreq):
     
@@ -153,18 +156,48 @@ def filter_vcf(infile, outfile, outdir, max_snv, min_cov, min_varfreq):
     #    os.remove(outdir + outfile)
 
 ####################################################################
-# repeat the maf creation for the filtered vcf. This is a slow and silly way, but quicker right now.
+# repeat the maf creation for the filtered vcf. This is a slow and silly way, but simpler right now.
 
 all_filtered_maf_name = config["vcf_folder"] + "all_samples_%s_S%s.maf" % (config["name"], len(raw_vcfs))
 all_filtered_annotated_name = config["vcf_folder"] + "all_samples_%s_S%s.tsv" % (config["name"], len(raw_vcfs))
 
+#@follows(filter_vcf)
+#@transform(filter_vcf, suffix(".vcf"), "_annotated.tsv")
+#def annotate_filtered_vcfs(infile, outfile):
+#    sample = SA.SampleAnnotation(infile, target_folder= "", run_tools=True)
+#    sample.print_rows()
+
 @follows(filter_vcf)
 @transform(filter_vcf, suffix(".vcf"), "_annotated.tsv")
-def annotate_filtered_vcfs(infile, outfile):
-    sample = SA.SampleAnnotation(infile, target_folder= "", run_tools=True)
-    sample.print_rows()
+def fetch_annotation_for_filtered_vcfs(infile, outfile):
+    sample = infile[:-4].split("/")[-1]
+    raw_annotated = config["raw_vcf_folder"] + sample + "_annotated.tsv"
+    
+    accepted_chromposes = []
+    with open(infile) as filtered: 
+        for row in filtered:
+            var = AP.VCFrow(row)
+            if var.chrompos:
+                accepted_chromposes.append(var.chrompos)
+    accepted_chromposes = set(accepted_chromposes)
+    
+    out = open(outfile, "w")
+    accepted = 0
+    with open(raw_annotated) as handle:
+        for row in handle:
+            if row[0] == "#" or "chrom" in row:
+                out.write(row)
+            else:
+                f = row.split("\t")
+                chrompos = f[1] +"\t"+ f[2]
+                if chrompos in accepted_chromposes:
+                    accepted += 1 
+                    out.write(row)
+    out.close()
+    logging.debug("Fetched %s of %s annotated rows for %s from %s." % (accepted, len(accepted_chromposes), infile, outfile))
 
-@follows(annotate_filtered_vcfs)
+
+@follows(fetch_annotation_for_filtered_vcfs)
 @merge(filter_vcf, all_filtered_annotated_name)
 def unite_annotated_filtered_vcfs(samples, output):
     SA.annotate_all_samples_as_one(filenames=samples, outfile=all_filtered_annotated_name)
