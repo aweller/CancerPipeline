@@ -4,7 +4,6 @@ import os
 import AnnotationRowParsers as AP
 import SampleAnnotation as SA
 import automate_vcf2maf as vcf2maf
-from cancer_pipeline_scripts import *
 import prepare_and_run_music as music
 import automate_mutsig as mutsig
 import pipeline_config as config
@@ -81,15 +80,29 @@ raw_vcfs = [config["raw_vcf_folder"]+x for x in os.listdir(config["raw_vcf_folde
                   "all" not in x and
                   "anno" not in x]
 
-if config.get("blacklist"):
-    blacklist = [x.strip() for x in open(config.get("blacklist")).readlines()]
-    raw_vcfs = [x for x in raw_vcfs if re.sub("_v[1-9]", "", x.split("/")[-1]) in blacklist] #TODO: remove the sub once the bam names are fixed
-if config.get("whitelist"):
-    whitelist = [x.strip() for x in open(config.get("whitelist")).readlines()]
-    raw_vcfs = [x for x in raw_vcfs if re.sub("_v[1-9]", "", x.split("/")[-1]) in whitelist] #TODO: remove the sub once the bam names are fixed
-
 logging.debug("Found %s raw input files:" % len(raw_vcfs))
-logging.debug(raw_vcfs)[:5]
+logging.debug(raw_vcfs[:5])
+
+# Blacklist contains "_v1" in names:
+if config.get("blacklist"):
+    logging.debug("Using blacklist %s" % config.get("blacklist"))
+    blacklist = [x.strip() for x in open(config.get("blacklist")).readlines()]
+    raw_vcfs = [x for x in raw_vcfs if x.split("/")[-1] not in blacklist] 
+if config.get("whitelist"):
+    logging.debug("Using whitelist %s" % config.get("whitelist"))
+    whitelist = [x.strip() for x in open(config.get("whitelist")).readlines()]
+    raw_vcfs = [x for x in raw_vcfs if x.split("/")[-1] in whitelist] 
+
+#TODO: remove the sub once the bam names are fixed
+# Blacklist doesnt contain "_v1"
+#if config.get("blacklist"):
+#    blacklist = [x.strip() for x in open(config.get("blacklist")).readlines()]
+#    raw_vcfs = [x for x in raw_vcfs if re.sub("_v[1-9]", "", x.split("/")[-1]) in blacklist] #TODO: remove the sub once the bam names are fixed
+#if config.get("whitelist"):
+#    whitelist = [x.strip() for x in open(config.get("whitelist")).readlines()]
+#    raw_vcfs = [x for x in raw_vcfs if re.sub("_v[1-9]", "", x.split("/")[-1]) in whitelist] #TODO: remove the sub once the bam names are fixed
+
+logging.debug("%s input files left after blacklist/whitelist filtering." % len(raw_vcfs))
 
 all_maf_name = config["raw_vcf_folder"] + "all_samples_%s_S%s.maf" % (config["name"], len(raw_vcfs))
 all_annotated_name = config["raw_vcf_folder"] + "all_samples_%s_S%s.tsv" % (config["name"], len(raw_vcfs))
@@ -223,32 +236,45 @@ def unite_filtered_mafs(samples, output):
 
 analysis_folder = config["analysis_folder"]
 music_run_flag = config["analysis_folder"] + "music_run_flag" # so ruffus has a way of knowing when Music has run
-mutsig_output = config["analysis_folder"] + "/output/mutsigcv_"
+mutsig_run_flag = config["analysis_folder"] + "mutsig_run_flag" # so ruffus has a way of knowing when MutSigCV has run
+mutsig_rename_flag = config["analysis_folder"] + "mutsig_rename_flag" # so ruffus has a way of knowing the files were renamed
+mutsig_output = config["analysis_folder"] + "/output/mutsigcv"
 
 @active_if(config.get("bam_folder"))
 @follows(unite_filtered_mafs)
-@follows(unite_annotated_filtered_vcfs,
-         mkdir([analysis_folder,
-                analysis_folder+"/input",
-                analysis_folder+"/output",
-                analysis_folder+"/output/roi_covgs",
-                analysis_folder+"/output/gene_covgs"]))
+@follows(unite_annotated_filtered_vcfs)
 @merge([unite_filtered_mafs, unite_annotated_filtered_vcfs], music_run_flag)
 def run_music(input_files, music_run_flag):
     logging.debug("Starting MuSiC from %s." % input_files)
     music.prepare_music_input(input_maf=input_files[0], annotationfile=input_files[1], config=config, runflag=music_run_flag)
 
+# TODO: the runflags need to be in the right dir (analysis)
+#@transform(unite_filtered_mafs, regex(r'(.+\/).+'), r"\1%s" % "mutsig_run_flag")
+
+
 @follows(unite_filtered_mafs)
-@transform(unite_filtered_mafs, regex(r'(.+\/).+'), r"\1%s" % "mutsig_run_flag")
+@transform(unite_filtered_mafs, regex(r'(.+\/).+'), mutsig_run_flag)
 def run_mutsig(input_maf, mutsig_run_flag):
     logging.debug("Starting MutSigCV from %s." % input_maf)
     mutsig.run_mutsig(input_maf, mutsig_output)
+    open(mutsig_run_flag, "w")
 
+@follows(run_mutsig)
+@transform(run_mutsig, regex(r'(.+\/).+'), mutsig_rename_flag)
+def rename_mutsig_out(infile, mutsig_rename_flag):
+    output_folder = config["analysis_folder"] + "/output/"
+    for filename in os.listdir(output_folder):
+        if os.path.isdir(output_folder+filename) or filename.startswith(project_name): continue        
+        new_name = project_name + "_" + filename
+        os.rename(output_folder+filename, output_folder+new_name)
+    open(mutsig_rename_flag, "w")
+
+        
 ########################################################################################
 ########################################################################################
 ########################################################################################
 
-last_steps = [run_music, run_mutsig]
+last_steps = [run_music, rename_mutsig_out]
 
 pipeline_printout(sys.stdout, last_steps)
 pipeline_printout_graph ( open("pipeline.png", "w"),"png", last_steps, no_key_legend=True)
