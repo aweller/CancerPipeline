@@ -14,7 +14,7 @@ import multiprocessing as mp
 import re
 import pprint
 
-def prepare_music_input(config=None, input_maf=None, annotationfile=None, runflag=None):
+def prepare_input_and_run_music(config=None, input_maf=None, annotationfile=None, runflag=None):
     
     pprint.pprint(config)
     

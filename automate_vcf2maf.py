@@ -1,6 +1,8 @@
 import os
 import subprocess
 import re
+from ToolConfig import vcf2maf_script, snpeff_jar, snpeff_config_file
+import logging
 
 def run_vcf2maf(input_vcf):
     
@@ -9,18 +11,19 @@ def run_vcf2maf(input_vcf):
         target_folder = "/".join(f[:-1]) + "/"
         input_vcf = f[-1]
     else:
-        target_folder = ""
+        target_folder = "."
     
-    output_maf = input_vcf.strip(".vcf") + ".maf"
+    output_maf = input_vcf[:-4] + ".maf"
     
-    if os.path.exists(output_maf):
+    if os.path.exists(target_folder + output_maf):
         print output_maf, "already present"
     
     else:
-        convert_cmd = "perl /home/andreas/bioinfo/core/vcf2maf_perl/vcf2maf-master/vcf2maf.pl --input-vcf %s/%s --output-maf %s/%s " % (target_folder, input_vcf, target_folder, output_maf)
-        snpeff_cmd =  """--snpeff-cmd "java -Xmx2g -jar /home/andreas/bioinfo/projects/wtc_quasar_analysis/scripts/snpeff/snpEff.jar hg19 -t -hgvs -c /home/andreas/bioinfo/projects/wtc_quasar_analysis/scripts/snpeff/snpEff.config" """ 
+        convert_cmd = "perl %s --input-vcf %s/%s --output-maf %s/%s " % (vcf2maf_script, target_folder, input_vcf, target_folder, output_maf)
+        snpeff_cmd =  """--snpeff-cmd 'java -Xmx2g -jar %s \
+                      hg19 -t -hgvs -c %s' """ % (snpeff_jar, snpeff_config_file) 
         
-        #print convert_cmd
+        logging.debug( convert_cmd+snpeff_cmd )
         subprocess.call(convert_cmd+snpeff_cmd, shell = True, stdout = open("log_out.txt", "wa"), stderr = open("log_err.txt", "wa"))
         
         try:
@@ -105,4 +108,8 @@ def main():
 ##############################################################################################
 
 if __name__ == '__main__':
-    main()
+    #main()
+    import sys
+    
+    infile = sys.argv[1]
+    run_vcf2maf(infile)

@@ -1,16 +1,17 @@
 import os
 import subprocess
 import sys
+from ToolConfig import mutsig_db, mutsig_matlab_folder, mutsig_run_script
+import logging
 
 def run_mutsig(input_maf, output_file):
     
-    db = "/home/andreas/bioinfo/core/mutsig/database"
     output_prefix = output_file    
-    matlab_dir = "/home/andreas/bin/matlab2/MATLAB_Compiler_Runtime/v81/"
     
-    mutseq_cmd = """/home/andreas/bioinfo/core/mutsig/MutSigCV_1.4/run_MutSigCV.sh %s %s %s/exome_full192.coverage.txt %s/gene.covariates.txt %s %s/mutation_type_dictionary_file.txt %s/chr_files_hg19""" % (matlab_dir, input_maf, db, db, output_prefix, db, db)
-
-    print mutseq_cmd
+    mutseq_cmd = """%s %s %s %s/exome_full192.coverage.txt %s/gene.covariates.txt \
+                 %s %s/mutation_type_dictionary_file.txt %s/chr_files_hg19""" % (mutsig_run_script, mutsig_matlab_folder, input_maf,
+                                                                                 mutsig_db, mutsig_db, output_prefix, mutsig_db, mutsig_db)
+    logging.debug( mutseq_cmd )
     subprocess.call(mutseq_cmd, shell = True)
     
 ###########################################################

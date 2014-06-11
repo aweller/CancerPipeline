@@ -6,6 +6,7 @@ import AnnotationRowParsers as ARP
 import automate_annovar as Autoanno
 import automate_snpeff as Autosnp 
 import collections
+import pandas as pd
 
 # TODO
 # include Annovar parser that corrects for the imprecise chromposes
@@ -178,8 +179,16 @@ class SampleAnnotation():
     #    all_keys = vcf_keys + tsv_keys + anno_keys
     #    return vcf_keys, tsv_keys, anno_keys, all_keys
 
+
+
 def annotate_all_samples_as_one(filenames=None, folder=None, outfile=None):
-        
+    """
+    Merge all annotated files in a folder into a single table
+    """
+
+    ##########################################################
+    # prepare variables
+    
     if not filenames and folder:
         filenames = [x for x in os.listdir(folder) if x.endswith(".vcf") and "snpeff" not in x and "anno" not in x]    
     elif not filenames and not folder:
@@ -187,49 +196,36 @@ def annotate_all_samples_as_one(filenames=None, folder=None, outfile=None):
     
     sample_no = len(filenames)
     
-    target_folder = folder
-    if not target_folder:
-        target_folder = "./"
-    
-    if "/" in outfile: # samplename is a full path
-        f = outfile.split("/")
-        outfolder = "/".join(f[:-1]) + "/"
-        outfile = f[-1]
-    else:
-        outfolder = "" 
-    
     if outfile:
         final_outname= outfile
     else:
         final_outname= "all_samples_annotated.tsv" 
-    
-    # create a unified vcf of all variants in all samples
-    
-    all_rows =  [open(filename).readlines() for filename in filenames]
-    all_rows = list( set( sum(all_rows, []) )) # flatten list of lists
-    all_variant_rows = [row for row in all_rows if row[0] != "#"]
-    #all_variant_rows.sort(cmp = sort_chromposes) #should not be necessary
-    
-    outname = outfolder + "all_samples.vcf" 
-    with open(outname, "w") as out:
-        for row in all_variant_rows:
-            out.write(row)
-            
-    # annotate the unified vcf. this is kind of a waste as we already have these annotations, 
-    # but cleaner than somehow passing the keys of all files around
-    
-    sample = SampleAnnotation(outname, run_tools = True)
-    sample.print_rows()
-    
-    # recreate the united file, as the other file just uses "all_samples" as the samplename
-    
-    unite_cmd = "head -n 1 %s/all_samples_annotated.tsv > %s/%s && cat %s/*T_annotated.tsv | grep -v sample >> %s/%s" % (outfolder, outfolder, final_outname, outfolder, outfolder, final_outname)
-    print unite_cmd
-    subprocess.call(unite_cmd, shell=True)
+        
+    ##########################################################
+    # fetch all files into DF
 
-    os.remove(outfolder + "all_samples.vcf")
-    os.remove(outfolder + "all_samples_annotated.tsv")
+    all_sample_dfs = []
     
+    filenames.sort()
+    for filename in filenames:
+        sample_df = pd.read_csv(filename, sep="\t")
+        all_sample_dfs.append(sample_df)
+        
+    df = pd.concat(all_sample_dfs).fillna("-")
+    
+    ##########################################################
+    # creat proper column order and print
+    
+    original_order = open(filenames[0]).readline().strip().split("\t")
+    all_headers = df.columns.tolist()
+    for header in all_headers:
+        if not header in original_order:
+            original_order.append(header)
+    df = df[original_order]
+    
+    df.to_csv(final_outname, sep="\t", index=False)
+
+
 def sort_chromposes(cp1, cp2):
     c1 = cp1.split("\t")[0].lstrip("chr")
     p1 = int(cp1.split("\t")[1])
