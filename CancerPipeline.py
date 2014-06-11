@@ -168,11 +168,8 @@ def filter_vcf(infile, outfile, outdir):
     min_varfreq = float(config.get("min_varfreq", 0))
     min_qual = int(config.get("min_qual", 0))
     
-    try:
-        vcf_type = config["vcf_type"]
-    except:
-        print "Sorry, you need to specify a vcf_type in the config file, e.g. 'illumina_strelka' or 'iontorrent'."
-            
+    vcf_type = config.get("vcf_type", "iontorrent")
+      
     with open(infile) as handle:
         variants = 0
         
@@ -284,6 +281,7 @@ mutsig_rename_flag = config["analysis_folder"] + "mutsig_rename_flag" # so ruffu
 mutsig_output = config["analysis_folder"] + "/output/mutsigcv"
 
 @active_if(config.get("bam_folder"))
+@active_if(config.get("functional_analysis", True))
 @follows(unite_filtered_mafs)
 @follows(unite_annotated_filtered_vcfs)
 @merge([unite_filtered_mafs, unite_annotated_filtered_vcfs], music_run_flag)

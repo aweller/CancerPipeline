@@ -62,14 +62,16 @@ Use absolute paths!
 - ref: path to the reference sequence (in fasta format)
 - whitelist: optionally, supply a list of samples from the raw_vcf_folder to be processed 
 
-**Run flags**
-- cpus: number of CPUs to use in parallel (default: 1)
-- vcf_type: select the type of input vcf (iontorrent/illumina_strelka) 
-- version_numbers_not_in_blacklist: legacy flag, don't use 
-
-**Filtering settings:**
+**Filtering settings (optional)**
 - min_cov: Minimum accepted coverage for a variant position
-- min_varfreq: Minimum variant frequency for a variant position 
+- min_varfreq: Minimum variant frequency for a variant position
+- min_qual: Minimum variant frequency for a variant position 
+
+**Run flags (optional)**
+- vcf_type: select the type of input vcf (iontorrent/illumina_strelka) (default: iontorrent)
+- cpus: number of CPUs to use in parallel (default: 1)
+- functional_analysis: if False, don't run MutSigCV and MuSiC (default: True)
+- version_numbers_not_in_blacklist: legacy flag, don't use 
 
 ##Dependencies
 
