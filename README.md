@@ -96,8 +96,7 @@ The list of significant genes created by is in *./analysis_mypipeline/output/myp
 
 ##Dependencies
 
-CoverageCheck expects a Linux system with Python 2.7 installed.
-The Python packages numpy (1.8.1+), pandas (0.13.1+) and ruffus (2.4+) are expected as well. 
+CoverageCheck was developed on Ubuntu 13.10 with Python 2.7 and the Python packages numpy (1.8.1+), pandas (0.13.1+) and ruffus (2.4+). 
 
 The pipeline depends on the installation of the following 3rd-party tools:
 
@@ -107,7 +106,7 @@ The pipeline depends on the installation of the following 3rd-party tools:
 - **MutSigCV** (v1.4)
 - **Genome Music** (v0.4)
 
-The install directories of these tools need to be set in ToolConfig.py.
+The install directories of these tools need to be set in **ToolConfig.py**.
 
 
 
