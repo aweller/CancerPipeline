@@ -33,14 +33,14 @@ File locations and settings for the pipeline *mypipeline* are saved as a Python 
 
 **Example**
 >   "mypipeline": dict(root = "/home/user/test/",  
->        raw_vcf_folder = "/home/user/test/vcfs_raw/",  
->        bam_folder = "/home/user/bams/",  
->        bed = "/home/user/test/roi_148gene_panel_HP.bed",  
->        ref = "/home/user/data/hg19.fasta",  
->        cpus = 1,  
->        verbose_logging = True,   
->        min_cov = 100,  
->        min_varfreq = 0.05)  
+>   raw_vcf_folder = "/home/user/test/vcfs_raw/",  
+>   bam_folder = "/home/user/bams/",  
+>   bed = "/home/user/test/roi_148gene_panel_HP.bed",  
+>   ref = "/home/user/data/hg19.fasta",  
+>   cpus = 1,  
+>   verbose_logging = True,   
+>   min_cov = 100,  
+>   min_varfreq = 0.05)  
 
 ##Usage
 
