@@ -29,7 +29,31 @@ touch the files that have **changed** since the last time it was run, not stupid
 The pipeline expects all unfiltered input vcf to be located in one folder. Per pipeline run, it will then create an output
 folder for the filtered and annotated vcfs and an output folder for the functional analysis tools.
 
-File locations and settings for the pipeline *mypipeline* are saved as a Python dictionary in *pipeline_config.py*.
+File locations and settings per pipeline are saved as a Python dictionary in **CancerPipelineConfig.py**.
+This file contains a Python dictionary for each pipeline.
+
+**Location settings**
+
+Use absolute paths!
+
+- root: the root folder of this pipeline 
+- raw_vcf_folder: the folder containing the unfiltered vcfs
+- bed: the bed file for this panel  
+- ref: path to the reference sequence (in fasta format)
+- bam_folder (optional): the folder containing the bam and bam.bai files. If not supplied, MuSiC will not be started.
+- whitelist (optional): a list of samples from the raw_vcf_folder to be processed 
+
+**Filtering settings (optional)**
+- min_cov: Minimum accepted coverage for a variant position
+- min_varfreq: Minimum variant frequency for a variant position
+- min_qual: Minimum variant frequency for a variant position 
+
+**Run flags (optional)**
+- vcf_type: select the type of input vcf (iontorrent/illumina_strelka) (default: iontorrent)
+- cpus: number of CPUs to use in parallel (default: 1)
+- functional_analysis: if False, don't run MutSigCV and MuSiC (default: True)
+- verbose_logging: if set to True, will result in more output while running (default: False)
+- version_numbers_not_in_blacklist: legacy flag, don't use
 
 **Example**
 
@@ -46,7 +70,6 @@ File locations and settings for the pipeline *mypipeline* are saved as a Python 
         
         min_cov = 100,  
         min_varfreq = 0.05)  
-
 
 
 ##Usage
@@ -70,37 +93,6 @@ The following files are created for all unfiltered inputs together:
 
 The folder *analysis_mypipeline* contains intermediate and output files for MuSiC and MutSigCV.
 The list of significant genes created by is in *./analysis_mypipeline/output/mypipeline_mutsigcv.sig_genes.txt*
-
-
-##Configuration
-
-The name and settings for each pipeline are configured in **CancerPipelineConfig.py**.
-
-This file contains a Python dictionary for each pipeline.
-
-**Location settings**
-
-Use absolute paths!
-
-- root: the root folder of this pipeline 
-- raw_vcf_folder: the folder containing the unfiltered vcfs
-- bed: the bed file for this panel  
-- ref: path to the reference sequence (in fasta format)
-
-- bam_folder (optional): the folder containing the bam and bam.bai files. If not supplied, MuSiC will not be started.
-- whitelist (optional): a list of samples from the raw_vcf_folder to be processed 
-
-**Filtering settings (optional)**
-- min_cov: Minimum accepted coverage for a variant position
-- min_varfreq: Minimum variant frequency for a variant position
-- min_qual: Minimum variant frequency for a variant position 
-
-**Run flags (optional)**
-- vcf_type: select the type of input vcf (iontorrent/illumina_strelka) (default: iontorrent)
-- cpus: number of CPUs to use in parallel (default: 1)
-- functional_analysis: if False, don't run MutSigCV and MuSiC (default: True)
-- verbose_logging: if set to True, will result in more output while running (default: False)
-- version_numbers_not_in_blacklist: legacy flag, don't use 
 
 ##Dependencies
 
