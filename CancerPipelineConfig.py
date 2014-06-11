@@ -49,6 +49,7 @@ config = {"test_Quasar_A1_VC1_VF01":
                     whitelist = "/home/andreas/bioinfo/projects/wtc_quasar_pipeline/data/test_whitelist_134.txt",
                     version_numbers_not_in_blacklist = True,
                     cpus = 1,
+                    verbose_logging = True, 
                     functional_analysis = True, 
                     vcf_type = "iontorrent",
                     min_cov = 100,

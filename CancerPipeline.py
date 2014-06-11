@@ -1,3 +1,28 @@
+#CancerPipeline
+#
+#This is the main script that contains the actual pipeline.
+#
+#The steps are as follows:
+#
+#**Annotation**
+#
+#- Filter variants according to coverage/allelfreq cutoffs.
+#- Annotate variants with Annovar and SNPeff.
+#- Transform sample vcfs into mafs.
+#- Unite all samples into a common output maf/vcf.
+#
+#**MuSiC**
+#
+#- Prepare input files for MuSiC (i.e. intersection of samples available as bam and samples in the united maf).
+#- Run all MuSiC tools sequentially.
+#
+#**MutSigCV**
+#
+#- Run MutSigCV on the united maf.
+#
+########################################################################################
+########################################################################################
+
 from ruffus import *
 import sys
 import os
@@ -14,19 +39,21 @@ import re
 
 # TODO
 # - fix the TODO related to not having "_v1" in the current bam names 
-# 
-# - there are still "non-confident" variants in the filtered output
-# - some buggy columns in the annotated files (e.g. numbers popping up in Codon_Change)
 
 #configure logging 
-logging.basicConfig(level=logging.DEBUG,
+logging_level = logging.INFO
+if config.get("verbose_logging"):
+    logging_level = logging.DEBUG
+
+logging.basicConfig(level=logging_level,
                 format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                 datefmt='%d-%m-%y %H:%M',
                 #filename= "pipeline_log.txt",
                 stream= sys.stdout)
                 #filemode='w')
 
-logging.debug("Logging DEBUG activated.")
+if config.get("verbose_logging"):
+    logging.debug("Logging DEBUG activated.")
 
 ########################################################################################
 # Parse the config file  ###############################################################

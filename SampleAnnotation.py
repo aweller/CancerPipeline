@@ -1,3 +1,6 @@
+#This script contains the class SampleAnnotation,
+#which creates and unites all annotation for one sample
+
 import os
 import pprint
 import sys

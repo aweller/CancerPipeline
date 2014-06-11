@@ -3,7 +3,7 @@
 
 This is a simple pipeline to automate the processing of cancer samples downstream of variant calling. 
 
-The steps are as follows:
+The pipeline steps are as follows:
 
 **Annotation**
 
@@ -21,9 +21,19 @@ The steps are as follows:
 
 - Run MutSigCV on the united maf.
 
+CancerPipeline is written in Python/ruffus and aware of which steps have been run before on which files. Each rerun of the pipeline will thus only 
+touch the files that have **changed** since the last time it was run, not stupidly rerun all of them.
+
 ##Input
 
+The pipeline expects all unfiltered input vcf to be located in one folder. Per pipeline run, it will then create an output
+folder for the filtered and annotated vcfs and an output folder for the functional analysis tools.
+
 File locations and settings for the pipeline *mypipeline* are saved as a Python dictionary in *pipeline_config.py*.
+
+##Usage
+
+> *"python CancerPipeline.py mypipeline".*
 
 ##Output
 
@@ -41,9 +51,6 @@ The following files are created for all unfiltered inputs together:
 The folder *analysis_mypipeline* contains intermediate and output files for MuSiC and MutSigCV.
 The list of significant genes created by is in *./analysis_mypipeline/output/mypipeline_mutsigcv.sig_genes.txt*
 
-##Usage
-
-> *"python CancerPipeline.py my_pipeline".*
 
 ##Configuration
 
@@ -51,16 +58,17 @@ The name and settings for each pipeline are configured in **CancerPipelineConfig
 
 This file contains a Python dictionary for each pipeline.
 
-**Location settings:**
+**Location settings**
 
 Use absolute paths!
 
 - root: the root folder of this pipeline 
 - raw_vcf_folder: the folder containing the unfiltered vcfs
-- bam_folder: the folder containing the bam and bam.bai files
 - bed: the bed file for this panel  
 - ref: path to the reference sequence (in fasta format)
-- whitelist: optionally, supply a list of samples from the raw_vcf_folder to be processed 
+
+- bam_folder (optional): the folder containing the bam and bam.bai files. If not supplied, MuSiC will not be started.
+- whitelist (optional): a list of samples from the raw_vcf_folder to be processed 
 
 **Filtering settings (optional)**
 - min_cov: Minimum accepted coverage for a variant position
@@ -71,12 +79,13 @@ Use absolute paths!
 - vcf_type: select the type of input vcf (iontorrent/illumina_strelka) (default: iontorrent)
 - cpus: number of CPUs to use in parallel (default: 1)
 - functional_analysis: if False, don't run MutSigCV and MuSiC (default: True)
+- verbose_logging: if set to True, will result in more output while running (default: False)
 - version_numbers_not_in_blacklist: legacy flag, don't use 
 
 ##Dependencies
 
 CoverageCheck expects a Linux system with Python 2.7 installed.
-The Python packages numpy (1.8.1+) and pandas (0.13.1+) are expected as well. 
+The Python packages numpy (1.8.1+), pandas (0.13.1+) and ruffus (2.4+) are expected as well. 
 
 The pipeline depends on the installation of the following 3rd-party tools:
 

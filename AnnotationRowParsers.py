@@ -1,3 +1,5 @@
+# This script contains the classes needed to parse VCFs, Annovar output and SNPeff output files
+
 import sys
 import re
 import operator
