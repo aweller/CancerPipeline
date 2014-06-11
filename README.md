@@ -40,8 +40,10 @@ File locations and settings for the pipeline *mypipeline* are saved as a Python 
         bam_folder = "/home/user/bams/",  
         bed = "/home/user/test/roi_148gene_panel_HP.bed",  
         ref = "/home/user/data/hg19.fasta",  
-        cpus = 1,  
+        
+        cpus = 4,  
         verbose_logging = True,   
+        
         min_cov = 100,  
         min_varfreq = 0.05)  
 
