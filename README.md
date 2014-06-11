@@ -32,8 +32,8 @@ folder for the filtered and annotated vcfs and an output folder for the function
 File locations and settings for the pipeline *mypipeline* are saved as a Python dictionary in *pipeline_config.py*.
 
 **Example**
->"mypipeline":     
->dict(root = "/home/user/test/",  
+>   "mypipeline":     
+>   dict(root = "/home/user/test/",  
 >        raw_vcf_folder = "/home/user/test/vcfs_raw/",  
 >        bam_folder = "/home/user/bams/",  
 >        bed = "/home/user/test/roi_148gene_panel_HP.bed",  
