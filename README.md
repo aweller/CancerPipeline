@@ -43,6 +43,10 @@ File locations and settings for the pipeline *mypipeline* are saved as a Python 
 >   min_cov = 100,  
 >   min_varfreq = 0.05)  
 
+"""
+test
+"""
+
 ##Usage
 
 > *"python CancerPipeline.py mypipeline".*
