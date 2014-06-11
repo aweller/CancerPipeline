@@ -5,21 +5,21 @@ This is a simple pipeline to automate the processing of cancer samples downstrea
 
 The steps are as follows:
 
-- Annotation
+**Annotation**
 
-Filter variants according to coverage/allelfreq cutoffs.
-Annotate variants with Annovar and SNPeff.
-Transform sample vcfs into mafs.
-Unite all samples into a common output maf/vcf.
+- Filter variants according to coverage/allelfreq cutoffs.
+- Annotate variants with Annovar and SNPeff.
+- Transform sample vcfs into mafs.
+- Unite all samples into a common output maf/vcf.
 
-- MuSiC
+**MuSiC**
 
-Prepare input files for MuSiC (i.e. intersection of samples available as bam and samples in the united maf).
-Run all MuSiC tools sequentially.
+- Prepare input files for MuSiC (i.e. intersection of samples available as bam and samples in the united maf).
+- Run all MuSiC tools sequentially.
 
-- MutSigCV
+**MutSigCV**
 
-Run MutSigCV on the united maf.
+- Run MutSigCV on the united maf.
 
 ##Input
 
@@ -39,7 +39,7 @@ The following files are created for all unfiltered inputs together:
 - *all_samples_mypipeline.tsv*: all filtered and annotated variants
 
 The folder *analysis_mypipeline* contains intermediate and output files for MuSiC and MutSigCV.
-The list of significant genes created by is in *./analysis_mypipeline/output/mypipeline_mutsigcv.sig_genes.txt
+The list of significant genes created by is in *./analysis_mypipeline/output/mypipeline_mutsigcv.sig_genes.txt*
 
 ##Usage
 
@@ -52,7 +52,8 @@ The name and settings for each pipeline are configured in **CancerPipelineConfig
 This file contains a Python dictionary for each pipeline.
 
 **Location settings:**
-Use absolute paths.
+
+Use absolute paths!
 
 - root: the root folder of this pipeline 
 - raw_vcf_folder: the folder containing the unfiltered vcfs
@@ -61,7 +62,8 @@ Use absolute paths.
 - ref: path to the reference sequence (in fasta format)
 - whitelist: optionally, supply a list of samples from the raw_vcf_folder to be processed 
 
-**Flags**
+**Run flags**
+- cpus: number of CPUs to use in parallel (default: 1)
 - vcf_type: select the type of input vcf (iontorrent/illumina_strelka) 
 - version_numbers_not_in_blacklist: legacy flag, don't use 
 
@@ -74,7 +76,7 @@ Use absolute paths.
 CoverageCheck expects a Linux system with Python 2.7 installed.
 The Python packages numpy (1.8.1+) and pandas (0.13.1+) are expected as well. 
 
-The pipeline depends on the installation of the following 2rd-party tools:
+The pipeline depends on the installation of the following 3rd-party tools:
 
 - **Annovar** (including the databases for all annotation sources, see Annovar documentation at http://www.openbioinformatics.org/annovar/annovar_download.html)
 - **SNPeff** (v3.5)

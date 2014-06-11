@@ -320,4 +320,4 @@ last_steps = [run_music, rename_mutsig_out]
 
 pipeline_printout(sys.stdout, last_steps)
 pipeline_printout_graph ( open("pipeline.png", "w"),"png", last_steps, no_key_legend=True)
-pipeline_run(multiprocess = 1)
+pipeline_run(multiprocess = config.get("cpus", 1))
