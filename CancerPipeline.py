@@ -34,7 +34,6 @@ import re
 import ConfigParser
 
 # Personal Modules in this folder
-import CancerPipelineConfig as config
 import AnnotationRowParsers as AP
 import SampleAnnotation as SA
 import automate_vcf2maf as vcf2maf
@@ -116,7 +115,11 @@ for key, value in config.iteritems():
 ###########################################################
 # create the necessary folders
 
-config = {item[0]:item[1] for item in Config.items(project_name)}    
+config = {}
+
+for item in Config.items(project_name):
+    config[item[0]] = item[1]
+
 config["name"] = project_name
 
 root = config["root"]
