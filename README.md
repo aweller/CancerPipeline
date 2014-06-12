@@ -38,7 +38,7 @@ The pipeline expects all unfiltered input vcf to be located in one folder. Diffe
             ├── sample1.vcf
             └── sample2.vcf
 
-Per pipeline run, it will then create an output folder for the filtered and annotated vcfs and an output folder for the functional analysis tools.
+CancerPipeline will then create output folders per project for the filtered and annotated vcfs and an output folder for the functional analysis tools.
 
     .
     └── root
