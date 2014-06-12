@@ -8,15 +8,15 @@ vcf2maf_script = "/home/andreas/bioinfo/core/vcf2maf_perl/vcf2maf-master/vcf2maf
 #############################################################################################################
 # SNPeff
 
-snpeff_jar = "/home/andreas/bioinfo/projects/wtc_quasar_analysis/scripts/snpeff/snpEff.jar"
-snpeff_config_file = "/home/andreas/bioinfo/projects/wtc_quasar_analysis/scripts/snpeff/snpEff.config"
+snpeff_jar = "/home/andreas/bioinfo/core/snpeff/snpEff.jar"
+snpeff_config_file = "/home/andreas/bioinfo/core/snpeff/snpEff.config"
 
 #############################################################################################################
 # Annovar
 
-convert2annovar_script = "/home/andreas/bioinfo/projects/wtc_quasar_analysis/scripts/annovar/convert2annovar.pl"
-table_annovar_script = "/home/andreas/bioinfo/projects/wtc_quasar_analysis/scripts/annovar/table_annovar.pl"
-annovar_db_folder = "/home/andreas/bioinfo/projects/wtc_quasar_analysis/scripts/annovar/humandb/"
+convert2annovar_script = "/home/andreas/bioinfo/core/annovar/convert2annovar.pl"
+table_annovar_script = "/home/andreas/bioinfo/core/annovar/table_annovar.pl"
+annovar_db_folder = "/home/andreas/bioinfo/core/annovar/humandb/"
 
 # the protocols specify from which information sources Annovar should fetch (see Annovar documentation)
 annovar_protocols = """refGene,phastConsElements46way,genomicSuperDups,esp6500si_all,
