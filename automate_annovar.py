@@ -6,7 +6,7 @@
 import sys
 import os 
 import subprocess
-from ToolConfig import convert2annovar_script, table_annovar_script, annovar_db_folder, annovar_protocols, annovar_operation
+from ToolConfig import convert2annovar_script, table_annovar_script, annovar_db_folder
 import logging
 
 def run_annovar(target_folder, target_vcf):
@@ -19,11 +19,15 @@ def run_annovar(target_folder, target_vcf):
     subprocess.call(convert_cmd, shell=True, stdout = open("log_out.txt", "wa"), stderr = open("log_err.txt", "wa"))
     logging.debug( convert_cmd )
     
-    annotate_cmd = """perl %s %s.annoin %s \
-                   -buildver hg19 -out %s -remove \
-                   -protocol %s -operation %s \
-                   -nastring - """ % (table_annovar_script, target_folder+outfile_name, annovar_db_folder, target_folder+outfile_name, annovar_protocols, annovar_operation)
+    #annotate_cmd = """perl %s %s.annoin %s -buildver hg19 -out %s -remove -protocol %s -operation %s -nastring - """ % (table_annovar_script, target_folder+outfile_name, annovar_db_folder, target_folder+outfile_name, annovar_protocols, annovar_operation)
+
+    annotate_cmd = """perl %s %s.annoin %s -buildver hg19 -out %s -remove \
+                   -protocol refGene,phastConsElements46way,genomicSuperDups,esp6500si_all,1000g2012apr_all,1000g2012apr_eur,1000g2012apr_afr,1000g2012apr_amr,1000g2012apr_asn,snp135,ljb2_all,cosmic67\
+                   -operation g,r,r,f,f,f,f,f,f,f,f,f\
+                   -nastring - """ % (table_annovar_script, target_folder+outfile_name, annovar_db_folder, target_folder+outfile_name)
+
     
+    print annotate_cmd
     logging.debug( annotate_cmd )
     subprocess.call(annotate_cmd, shell=True, stdout = open("log_out.txt", "wa"), stderr = open("log_err.txt", "wa"))
     
