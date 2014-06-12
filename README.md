@@ -21,10 +21,14 @@ The pipeline steps are as follows:
 
 - Run MutSigCV on the united maf.
 
-CancerPipeline is written in Python/ruffus and aware of which steps have been run before on which files. Each rerun of the pipeline will thus only 
+CancerPipeline is written in Python/ruffus and aware of which steps have been run before on which files. Each rerun of a pipeline will thus only 
 touch the files that have **changed** since the last time it was run, not stupidly rerun all of them.
 
 ##Input
+
+CancerPipeline allows the definition of different **projects**, each with different filtering settings, a different name etc.
+If new samples arrive, a project can easily be rerun to bring all folders, files and functional analyses for that project up to date.
+In the following examples, our project is called *myproject*.
 
 The pipeline expects all unfiltered input vcf to be located in one folder.
 
@@ -38,12 +42,12 @@ Per pipeline run, it will then create an output folder for the filtered and anno
 
     .
     └── root
-        ├── analysis_mypipeline
+        ├── analysis_myproject
         │   ├── input
-        │   │   └── mypipeline_input.txt
+        │   │   └── myproject_input.txt
         │   └── output
-        │       └── mypipeline_sign_genes.txt
-        ├── vcfs_mypipeline
+        │       └── myproject_sign_genes.txt
+        ├── vcfs_myproject
         │   ├── sample1_annotated.tsv
         │   ├── sample1.vcf
         │   ├── sample2_annotated.tsv
@@ -52,10 +56,25 @@ Per pipeline run, it will then create an output folder for the filtered and anno
             ├── sample1.vcf
             └── sample2.vcf
 
-File locations and settings per pipeline are saved into a regular text file in Python configuration format (see below).
-The file contains information on each pipeline that was run, serving both as a config file for the current runs and a log file for past runs.
+File locations and settings per project are saved into a regular text file in Python configuration format (see below).
+The file contains information on each project that was run, serving both as a config file for the current runs and a log file for past runs.
 
 **Location settings**
+
+**Example project definition file**
+
+    [myproject]
+    
+    root = /home/user/root/
+    raw_vcf_folder = /home/user/root/vcfs_raw/
+    bam_folder = /home/user/test/bams/
+    bed = /home/user/root/data/myproject.bed
+    ref = /home/user/root/data/hg19.fasta
+
+    cpus = 1
+    verbose_logging = False 
+    min_cov = 100
+    min_varfreq = 0.05
 
 Use absolute paths!
 
@@ -79,35 +98,19 @@ Use absolute paths!
 - verbose_logging: if set to True, will result in more output while running (default: False)
 - version_numbers_not_in_blacklist: legacy flag, don't use
 
-**Example definition file**
-
-    [Quasar_A1_VC1_VF03]
-    
-    root = /home/user/root/
-    raw_vcf_folder = /home/user/root/vcfs_raw/
-    bam_folder = /home/user/test/bams/
-    bed = /home/user/root/data/mypipeline.bed
-    ref = /home/user/root/data/hg19.fasta
-
-    cpus = 1
-    verbose_logging = False 
-    min_cov = 100
-    min_varfreq = 0.05
-
-
 ##Usage
 
-If there's only one pipeline in the definition file, the only argument needed is the name of the file:
+If there's only one project in the definition file, the only argument needed is the name of the file:
 
-    > python CancerPipeline.py pipeline_definitions.txt
+    > python CancerPipeline.py project_definitions.txt
 
-If there's more than one pipeline defined, we need to select a pipeline with the 2nd argument::
+If there's more than one project defined, we need to select a project with the 2nd argument::
 
-    > python CancerPipeline.py pipeline_definitions.txt mypipeline
+    > python CancerPipeline.py project_definitions.txt myproject
 
 ##Output
 
-For each unfiltered input *mysample*, the following outputs are created in a new folder named *./mypipeline/*:
+For each unfiltered input *mysample*, the following outputs are created in a new folder named *./myproject/*:
 
 - *mysample.vcf*: all variants that passed the filtering step
 - *mysample.maf*: all filtered variants, in maf format
@@ -115,11 +118,11 @@ For each unfiltered input *mysample*, the following outputs are created in a new
 
 The following files are created for all unfiltered inputs together:
 
-- *all_samples_mypipeline.maf*: all filtered variants in maf format 
-- *all_samples_mypipeline.tsv*: all filtered and annotated variants
+- *all_samples_myproject.maf*: all filtered variants in maf format 
+- *all_samples_myproject.tsv*: all filtered and annotated variants
 
-The folder *analysis_mypipeline* contains intermediate and output files for MuSiC and MutSigCV.
-The list of significant genes created by is in *./analysis_mypipeline/output/mypipeline_mutsigcv.sig_genes.txt*
+The folder *analysis_myproject* contains intermediate and output files for MuSiC and MutSigCV.
+The list of significant genes created by is in *./analysis_myproject/output/myproject_mutsigcv.sig_genes.txt*
 
 ##Dependencies
 
