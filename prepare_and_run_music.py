@@ -48,7 +48,10 @@ def prepare_input_and_run_music(config=None, input_maf=None, annotationfile=None
     
     bam_files = [x for x in os.listdir(bam_folder)]
     bam_samples = set([unify_sample_name(x) for x in bam_files if x.endswith("T.bam")])
-    bam_paths = {bam:dict(Normal = None, Tumor = None) for bam in bam_samples}
+    
+    bam_paths = {}
+    for bam in bam_samples:
+        bam_paths[bam] = dict(Normal = None, Tumor = None)
        
     for bam in bam_files:
         if not bam_paths.get(unify_sample_name(bam)):
