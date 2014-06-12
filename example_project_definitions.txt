@@ -12,7 +12,7 @@ verbose_logging = True
 functional_analysis = True 
 vcf_type = iontorrent
 min_cov = 100
-min_varfreq = 0.05)
+min_varfreq = 0.05
             
 [Quasar_A1_VC1_VF04]
 
@@ -24,4 +24,4 @@ ref = /home/andreas/bioinfo/core/general/data/hg19.fasta
 whitelist = /home/andreas/bioinfo/projects/wtc_quasar_pipeline/data/test_whitelist_134.txt
 
 min_cov = 400
-min_varfreq = 0.1)
+min_varfreq = 0.1

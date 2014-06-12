@@ -206,7 +206,7 @@ def create_music_bam_path_file(bam_list, bam_dict, output_file):
 
 def unite_calc_covg(ref=None, bed = None, bams = None, outfolder = None):
     unite_cmd = "genome music bmr calc-covg --roi-file %s --reference-sequence %s --bam-list %s --output-dir %s" % (bed, ref, bams, outfolder)
-    calc_cmd( unite_cmd )
+    logging.debug( unite_cmd )
     out = open("music_log.txt", "wa")
     subprocess.call(unite_cmd, shell=True, stdout=out, stderr=out)
     out.close()
