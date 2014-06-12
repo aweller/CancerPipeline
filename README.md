@@ -7,7 +7,7 @@ The pipeline steps are as follows:
 
 **Annotation**
 
-- Filter variants according to coverage/allelfreq cutoffs.
+- Filter variants according to coverage, allele frequency or quality cutoffs.
 - Annotate variants with Annovar and SNPeff.
 - Transform sample vcfs into mafs.
 - Unite all samples into a common output maf/vcf.
@@ -89,7 +89,7 @@ Use absolute paths!
 **Filtering settings (optional)**
 - min_cov: Minimum accepted coverage for a variant position
 - min_varfreq: Minimum variant frequency for a variant position
-- min_qual: Minimum variant frequency for a variant position 
+- min_qual: Minimum quality for a variant position 
 
 **Run flags (optional)**
 - vcf_type: select the type of input vcf (iontorrent/illumina_strelka) (default: iontorrent)
