@@ -27,10 +27,14 @@ def run_annovar(target_folder, target_vcf):
                    -nastring - """ % (table_annovar_script, target_folder+outfile_name, annovar_db_folder, target_folder+outfile_name)
 
     
-    print annotate_cmd
     logging.debug( annotate_cmd )
-    subprocess.call(annotate_cmd, shell=True, stdout = open("log_out.txt", "wa"), stderr = open("log_err.txt", "wa"))
+    result = subprocess.call(annotate_cmd, shell=True, stdout = open("log_out.txt", "wa"), stderr = open("log_err.txt", "wa"))
     
+    if result > 0:
+        logging.critical( annotate_cmd )
+        logging.critical( "Annovar failed. Is this a working command?" )
+        sys.exit()
+        
     annovar_output = target_folder + outfile_name + ".hg19_multianno.txt"
     
     return annovar_output 
