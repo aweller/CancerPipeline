@@ -44,7 +44,7 @@ def run_annovar(target_folder, target_vcf):
 if __name__ == '__main__':
     
     logger=logging.getLogger()
-    logger.setlevel(DEBUG)
+    logger.setLevel(logging.DEBUG)
 
     target_folder = os.getcwd() + "/"
     target_vcf = sys.argv[1]
