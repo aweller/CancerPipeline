@@ -380,7 +380,7 @@ def rename_mutsig_out(infile, mutsig_rename_flag):
         
         pipeline_identifier = project_name + "_S" + str(len(raw_vcfs))
         
-        if os.path.isdir(output_folder+filename) or filename.startswith(pipeline_identifier): continue        
+        if os.path.isdir(output_folder+filename) or filename.startswith(project_name): continue        
         new_name = pipeline_identifier + "_" + filename
         os.rename(output_folder+filename, output_folder+new_name)
     open(mutsig_rename_flag, "w")

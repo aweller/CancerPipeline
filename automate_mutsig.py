@@ -12,7 +12,12 @@ def run_mutsig(input_maf, output_file):
                  %s %s/mutation_type_dictionary_file.txt %s/chr_files_hg19""" % (mutsig_run_script, mutsig_matlab_folder, input_maf,
                                                                                  mutsig_db, mutsig_db, output_prefix, mutsig_db, mutsig_db)
     logging.debug( mutseq_cmd )
-    subprocess.call(mutseq_cmd, shell = True)
+    result = subprocess.call(mutseq_cmd, shell = True)
+    
+    if result > 0:
+        logging.critical( mutseq_cmd )
+        logging.critical( "MutSigCV failed. Is this a working command?" )
+        sys.exit()
     
 ###########################################################
 

@@ -65,7 +65,7 @@ The file contains information on each project that was run, serving both as a co
     
     root = /home/user/root/
     raw_vcf_folder = /home/user/root/vcfs_raw/
-    bam_folder = /home/user/test/bams/
+    bam_folder = /home/user/bams/
     bed = /home/user/root/data/myproject.bed
     ref = /home/user/root/data/hg19.fasta
 
