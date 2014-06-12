@@ -13,11 +13,10 @@ import subprocess
 import multiprocessing as mp
 import re
 import pprint
+import logging
 
 def prepare_input_and_run_music(config=None, input_maf=None, annotationfile=None, runflag=None):
-    
-    pprint.pprint(config)
-    
+        
     bam_folder = config["bam_folder"]
     
     analysis_folder = config["analysis_folder"]
@@ -69,7 +68,7 @@ def prepare_input_and_run_music(config=None, input_maf=None, annotationfile=None
     
     music_input_samples = bam_samples & maf_samples
     music_input_samples = set([x for x in music_input_samples if bam_paths.get(x)]) # reduce to bams with dict entry
-    print "Number of samples present in both bamfolder and maf-file:", len(music_input_samples)
+    logging.debug( "Number of samples present in both bamfolder and maf-file: " + str(len(music_input_samples)) )
     
     bams_output_file = input_folder + "music_bam_path_list_%s.txt" % len(music_input_samples)
     
@@ -77,10 +76,10 @@ def prepare_input_and_run_music(config=None, input_maf=None, annotationfile=None
     coverage_2do_samples = music_input_samples - coverage_samples 
     
     if coverage_2do_samples:
-        print "Found %s bams that need coverage calculation, starting..." % len(coverage_2do_samples)
+        logging.debug(  "Found %s bams that need coverage calculation, starting..." % len(coverage_2do_samples) )
         run_multiple_calc_covg(ref=reffile, bed = bedfile, bams = coverage_2do_samples, bam_dict = bam_paths, outfolder = coverage_folder, cpus=cpus)
         
-    print "Uniting covg files..."
+    logging.debug(  "Uniting covg files..." )
     bams_path_file = create_music_bam_path_file(music_input_samples, bam_paths, bams_output_file)
     unite_calc_covg(ref=reffile, bed=bedfile, bams=bams_path_file, outfolder=output_folder)
 
@@ -99,10 +98,10 @@ def prepare_input_and_run_music(config=None, input_maf=None, annotationfile=None
     ######################################################################################
     # create output
     
-    print "Printing bam list for MuSiC"
+    logging.debug(  "Printing bam list for MuSiC" )
     bams_path_file = create_music_bam_path_file(music_input_samples, bam_paths, bams_output_file)
     
-    print "Printing maf input for MuSiC"
+    logging.debug(  "Printing maf input for MuSiC" )
         
     modified_maf = input_folder + "music_input_%s.maf" % len(music_input_samples)
     create_modified_maf(bams=music_input_samples, maf=input_maf, outfile=modified_maf, annotationfile=annotationfile)
@@ -114,9 +113,9 @@ def prepare_input_and_run_music(config=None, input_maf=None, annotationfile=None
     #######################################################################################
     ## MuSiC
     
-    print "#" * 50
-    print "################ Starting MuSiC ##################"
-    print "#" * 50
+    logging.debug(  "#" * 50 )
+    logging.debug(  "################ Starting MuSiC ##################" )
+    logging.debug(  "#" * 50 )
     
     run_bmr(ref=reffile, bed=bedfile, bams=bams_path_file, outfolder=output_folder, maf=modified_maf)
     run_smg(outfolder=output_folder)
@@ -133,7 +132,7 @@ def prepare_input_and_run_music(config=None, input_maf=None, annotationfile=None
     
     flag = open(runflag, "w")
     flag.close()
-    print "MuSiC run succesfully!"
+    logging.debug(  "MuSiC run successfully!" )
     
 ######################################################################################
 
@@ -146,13 +145,11 @@ def create_modified_maf(bams=None, maf=None, outfile=None, annotationfile=None):
     with open(annotationfile) as handle:
         for row in handle:
             if "sample" in row: continue
-            #print row
             f = row.split()
             chrompos_refalt = "\t".join([f[1], f[2], f[4], f[5]])
             info = f[53]
         
             if info != "-":
-                #print info
                 info = info.split(",")[0].split(":")
                 
                 if len(info) > 4:
@@ -206,7 +203,7 @@ def create_music_bam_path_file(bam_list, bam_dict, output_file):
 
 def unite_calc_covg(ref=None, bed = None, bams = None, outfolder = None):
     unite_cmd = "genome music bmr calc-covg --roi-file %s --reference-sequence %s --bam-list %s --output-dir %s" % (bed, ref, bams, outfolder)
-    #print unite_cmd
+    calc_cmd( unite_cmd )
     out = open("music_log.txt", "wa")
     subprocess.call(unite_cmd, shell=True, stdout=out, stderr=out)
     out.close()
@@ -222,7 +219,8 @@ def run_multiple_calc_covg(bed = None, ref=None, bams = None, bam_dict = None, o
         out = outfolder + bam + ".covg"
     
         calc_cmd = "calcRoiCovg %s %s %s %s %s 6 8 20" % (nbam, tbam, bed, ref, out)
-
+        logging.debug(calc_cmd)        
+        
         if cpus == 1:
             execute(calc_cmd, bam)
         else:
@@ -234,13 +232,12 @@ def run_multiple_calc_covg(bed = None, ref=None, bams = None, bam_dict = None, o
         
 def execute(cmd, sample=None):
     if sample:
-        print "Starting process for", sample
-        
+        logging.debug(  "Starting process for %s" % sample )
     subprocess.call(cmd, shell=True)
         
 def run_bmr(bams=None, maf=None, outfolder=None, ref=None, bed=None):
-    print "#" * 50
-    print "Starting background mutation rate calculation (bmr)."
+    logging.debug(  "#" * 50 )
+    logging.debug(  "Starting background mutation rate calculation (bmr)." )
     
     bmr_cmd = """genome music bmr calc-bmr \
     --bam-list %s \
@@ -250,13 +247,14 @@ def run_bmr(bams=None, maf=None, outfolder=None, ref=None, bed=None):
     --roi-file %s \
     --genes-to-ignore TP53,APC """ % (bams, maf, outfolder, ref, bed)
     
+    logging.debug(bmr_cmd)        
     out = open("music_log.txt", "wa")
     subprocess.call(bmr_cmd, shell=True, stdout=out, stderr=out)
     out.close()
     
 def run_smg(outfolder=None):
-    print "#" * 50
-    print "Starting calculation of sign. mutated genes (smg)."
+    logging.debug(  "#" * 50 )
+    logging.debug(  "Starting calculation of sign. mutated genes (smg)." )
     
     gene_mrs = outfolder + "gene_mrs"
     out = outfolder + "smgs"
@@ -265,14 +263,14 @@ def run_smg(outfolder=None):
           --gene-mr-file %s \
           --output-file %s """ % (gene_mrs, out)
     
-    #print smg_cmd
+    logging.debug(smg_cmd)        
     out = open("music_log.txt", "wa")
     subprocess.call(smg_cmd, shell=True, stdout=out, stderr=out)
     out.close()
     
 def run_mutation_relation(outfolder=None, maf=None, bams=None):
-    print "#" * 50
-    print "Starting permutation of related mutations."
+    logging.debug(  "#" * 50 )
+    logging.debug(  "Starting permutation of related mutations." )
     
     outfile = outfolder + "mutation_relation.csv"
     matrix = outfolder + "mutation_relation_matrix.csv"
@@ -284,7 +282,7 @@ def run_mutation_relation(outfolder=None, maf=None, bams=None):
         --mutation-matrix-file %s\
         --output-file %s""" % (bams, maf, matrix, outfile) 
     
-    #print relation_cmd
+    logging.debug(relation_cmd)        
     out = open("music_log.txt", "wa")
     subprocess.call(relation_cmd, shell=True, stdout=out, stderr=out)
     out.close()
@@ -295,8 +293,8 @@ def run_pathways(outfolder=None, maf=None, bams=None, pathways=None):
     gene_covg_dir = outfolder + "gene_covgs"
     out = outfolder + "sm_pathways_" + pathway_name 
 
-    print "#" * 50
-    print "Starting pathway analysis for %s." % (pathway_name)
+    logging.debug(  "#" * 50 )
+    logging.debug(  "Starting pathway analysis for %s." % (pathway_name) )
 
     path_cmd = """genome music path-scan \
         --bam-list %s \
@@ -306,29 +304,30 @@ def run_pathways(outfolder=None, maf=None, bams=None, pathways=None):
         --pathway-file %s \
         --genes-to-ignore TP53 \
         --bmr 8.7E-07""" % (bams, gene_covg_dir, maf, out, pathways)
-        
+    logging.debug(path_cmd)        
     out = open("music_log.txt", "wa")
     subprocess.call(path_cmd, shell=True, stdout=out, stderr=out)
     out.close() 
 
 def run_proximity(outfolder=None, maf=None):
     
-    print "#" * 50
-    print "Starting proximity analysis." 
+    logging.debug(  "#" * 50 )
+    logging.debug(  "Starting proximity analysis." )
 
     prox_cmd = """genome music proximity \
         --maf-file %s \
         --output-dir %s \
         --max-proximity 150""" % (maf, outfolder)
     
+    logging.debug(prox_cmd)
     out = open("music_log.txt", "wa")
     subprocess.call(prox_cmd, shell=True, stdout=out, stderr=out)
     out.close()
 
 def run_omim(outfolder=None, maf=None):
     
-    print "#" * 50
-    print "Starting OMIM annotation." 
+    logging.debug(  "#" * 50 )
+    logging.debug(  "Starting OMIM annotation." )
 
     outfile = outfolder + "omim_annotation.tsv"
 
@@ -337,7 +336,7 @@ def run_omim(outfolder=None, maf=None):
         --output-file %s \
         --no-verbose""" % (maf, outfile)
     
-    #print omim_cmd    
+    logging.debug(omim_cmd)
     out = open("music_log.txt", "wa")
     subprocess.call(omim_cmd, shell=True, stdout=out, stderr=out)
     out.close()

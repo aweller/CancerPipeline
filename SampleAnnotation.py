@@ -10,6 +10,7 @@ import automate_annovar as Autoanno
 import automate_snpeff as Autosnp 
 import collections
 import pandas as pd
+import logging
 
 # TODO
 # include Annovar parser that corrects for the imprecise chromposes
@@ -195,8 +196,10 @@ def annotate_all_samples_as_one(filenames=None, folder=None, outfile=None):
     if not filenames and folder:
         filenames = [x for x in os.listdir(folder) if x.endswith(".vcf") and "snpeff" not in x and "anno" not in x]    
     elif not filenames and not folder:
-        print "Please specify either a is of samples or a target folder."
-    
+        logging.critical( "annotate_all_samples_as_one() failed." )
+        logging.critical( "Please specify either a list of samples or a target folder." )
+        sys.exit()
+        
     sample_no = len(filenames)
     
     if outfile:

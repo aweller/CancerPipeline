@@ -26,11 +26,24 @@ touch the files that have **changed** since the last time it was run, not stupid
 
 ##Input
 
-The pipeline expects all unfiltered input vcf to be located in one folder. Per pipeline run, it will then create an output
-folder for the filtered and annotated vcfs and an output folder for the functional analysis tools.
+The pipeline expects all unfiltered input vcf to be located in one folder.
 
-File locations and settings per pipeline are saved as a Python dictionary in **CancerPipelineConfig.py**.
-This file contains a Python dictionary for each pipeline.
+    .
+    └── root  
+        └── vcfs_raw  
+
+Per pipeline run, it will then create an output folder for the filtered and annotated vcfs and an output folder for the functional analysis tools.
+
+    .
+    └── root  
+        ├── analysis_mypipeline  
+        │   ├── input  
+        │   └── output  
+        ├── vcfs_mypipeline  
+        └── vcfs_raw  
+
+File locations and settings per pipeline are saved into a regular text file in Python configuration format (see below).
+The file contains information on each pipeline that was run, serving both as a config file for the current runs and a log file for past runs.
 
 **Location settings**
 
@@ -41,7 +54,8 @@ Use absolute paths!
 - bed: the bed file for this panel  
 - ref: path to the reference sequence (in fasta format)
 - bam_folder (optional): the folder containing the bam and bam.bai files. If not supplied, MuSiC will not be started.
-- whitelist (optional): a list of samples from the raw_vcf_folder to be processed 
+- whitelist (optional): a list of samples from the raw_vcf_folder to process (default: use whole folder) 
+- blacklist (optional): a list of samples from the raw_vcf_folder to NOT process (default: use whole folder) 
 
 **Filtering settings (optional)**
 - min_cov: Minimum accepted coverage for a variant position
@@ -55,28 +69,31 @@ Use absolute paths!
 - verbose_logging: if set to True, will result in more output while running (default: False)
 - version_numbers_not_in_blacklist: legacy flag, don't use
 
-**Example**
+**Example definition file**
 
-    "mypipeline": 
+    [Quasar_A1_VC1_VF03]
+    
+    root = /home/user/root/
+    raw_vcf_folder = /home/user/root/vcfs_raw/
+    bam_folder = /home/user/test/bams/
+    bed = /home/user/root/data/mypipeline.bed
+    ref = /home/user/root/data/hg19.fasta
 
-    dict(root = "/home/user/test/",  
-        raw_vcf_folder = "/home/user/test/vcfs_raw/",  
-        bam_folder = "/home/user/bams/",  
-        bed = "/home/user/test/roi_148gene_panel_HP.bed",  
-        ref = "/home/user/data/hg19.fasta",  
-        
-        cpus = 4,  
-        verbose_logging = True,   
-        
-        min_cov = 100,  
-        min_varfreq = 0.05)  
+    cpus = 1
+    verbose_logging = False 
+    min_cov = 100
+    min_varfreq = 0.05
 
 
 ##Usage
 
-The only argument needed is the name of the pipeline to run.
+If there's only one pipeline in the definition file, the only argument needed is the name of file:
 
-    > python CancerPipeline.py mypipeline
+    > python CancerPipeline.py 
+
+If there's more than one pipeline defined, we need to select a pipeline with the 2nd argument::
+
+    > python CancerPipeline.py pipeline_definitions.txt mypipeline
 
 ##Output
 

@@ -23,26 +23,81 @@
 ########################################################################################
 ########################################################################################
 
+# General Python modules
 from ruffus import *
 import sys
 import os
+import pprint
+import shutil
+import logging
+import re
+import ConfigParser
+
+# Personal Modules in this folder
+import CancerPipelineConfig as config
 import AnnotationRowParsers as AP
 import SampleAnnotation as SA
 import automate_vcf2maf as vcf2maf
 import prepare_and_run_music as music
 import automate_mutsig as mutsig
-import CancerPipelineConfig as config
-import pprint
-import shutil
-import logging
-import re
 
 # TODO
 # - fix the TODO related to not having "_v1" in the current bam names 
 
-#configure logging 
+########################################################################################
+# Parse the config file  ###############################################################
+########################################################################################
+
+###########################################################
+# run sanity checks on the input file
+
+if len(sys.argv) == 1:
+    logging.critical( "Please supply the name of your project definition file as the 1st argument." )
+    logging.critical( "If the file contains more than one project, supply your project name as the 2nd argument." )
+    sys.exit()
+
+pipeline_definitions_file = sys.argv[1]
+
+Config = ConfigParser.ConfigParser()
+Config.read(pipeline_definitions_file)
+project_names = Config.sections()
+
+if not project_names:
+    logging.critical( "%s is an invalid file." %  pipeline_definitions_file)
+    logging.critical( "No valid project definitions found." )
+    logging.critical( "Please check the documentation for examples of correct definitions." )
+    sys.exit()
+
+raw_project_names = [x.strip().strip("[]") for x in open(pipeline_definitions_file).readlines() if x[0] == "["]
+for name in project_names:
+    if raw_project_names.count(name) > 1:
+        logging.critical( "%s is an invalid project definition file." %  pipeline_definitions_file)
+        logging.critical( "%s was defined more than once." % name)
+        sys.exit()
+
+if len(project_names) == 1:
+    project_name = project_names[0]
+elif len(sys.argv) > 2:
+    project_name = sys.argv[2]
+else:
+    logging.critical( "No project name supplied and %s has more than one project defined." %  pipeline_definitions_file)
+    logging.critical( "Please supply one of the following as the 2nd argument:" )
+    for name in project_names:
+        logging.critical( name )
+    sys.exit()
+
+if project_name not in project_names:
+    logging.critical( "Project name not defined, please choose from the following or define a new project:" )
+    logging.critical( "\n".join(pipelines) )
+    sys.exit()
+
+config = {item[0]:item[1] for item in Config.items(project_name)}
+
+###########################################################
+#configure logging
+
 logging_level = logging.INFO
-if config.get("verbose_logging"):
+if config.get("verbose_logging", False) == True:
     logging_level = logging.DEBUG
 
 logging.basicConfig(level=logging_level,
@@ -55,24 +110,16 @@ logging.basicConfig(level=logging_level,
 if config.get("verbose_logging"):
     logging.debug("Logging DEBUG activated.")
 
-########################################################################################
-# Parse the config file  ###############################################################
-########################################################################################
+for key, value in config.iteritems():
+    logging.info( "%s = %s" % (key, value) )
 
-project_name = sys.argv[1]
+###########################################################
+# create the necessary folders
 
-config = config.config
-
-if not config.get(project_name):
-    print "Unknown project, please choose from the following or define a new project:"
-    print "\n".join( config.keys() )
-    sys.exit()
-    
-config = config[project_name]
+config = {item[0]:item[1] for item in Config.items(project_name)}    
 config["name"] = project_name
 
 root = config["root"]
-#config["bam_folder"] = root + "bams/"
 config["vcf_folder"] = root + "vcfs_%s/" % (project_name)
 config["analysis_folder"] = root + "analysis_%s/" % (project_name)
 
@@ -97,7 +144,6 @@ for root, dirs, files in os.walk(root):
 
 ###########################################################
 # Clean up the folders of intermediate files that might be left over from previous pipeline runs
-
 
 def clean_folders_of_intermediate_files():
 
@@ -129,7 +175,7 @@ logging.debug("Found %s raw input files:" % len(raw_vcfs))
 logging.debug(raw_vcfs[:5])
 
 if not config.get("version_numbers_not_in_blacklist"):
-    # The usual case: both blacklist and samples contains "_v1":
+    # The usual case: both blacklist and samples contains "_v1", nothing to fix
     if config.get("blacklist"):
         logging.debug("Using blacklist %s" % config.get("blacklist"))
         blacklist = [x.strip() for x in open(config.get("blacklist")).readlines()]
@@ -329,7 +375,7 @@ def rename_mutsig_out(infile, mutsig_rename_flag):
     output_folder = config["analysis_folder"] + "/output/"
     for filename in os.listdir(output_folder):
         
-        pipeline_identifier = project_name + "_S " + str(len(raw_vcfs))
+        pipeline_identifier = project_name + "_S" + str(len(raw_vcfs))
         
         if os.path.isdir(output_folder+filename) or filename.startswith(pipeline_identifier): continue        
         new_name = pipeline_identifier + "_" + filename
@@ -340,9 +386,15 @@ def rename_mutsig_out(infile, mutsig_rename_flag):
 ########################################################################################
 ########################################################################################
 ########################################################################################
+# Start pipeline
 
 last_steps = [run_music, rename_mutsig_out]
-
 pipeline_printout(sys.stdout, last_steps)
 pipeline_printout_graph ( open("pipeline.png", "w"),"png", last_steps, no_key_legend=True)
-pipeline_run(multiprocess = config.get("cpus", 1))
+
+if config.get("verbose_logging", False) == True:
+    verbosity = 2
+else:
+    verbosity = 1
+
+pipeline_run(multiprocess = int(config.get("cpus", 1)), verbose=verbosity, logger=logging.getLogger())

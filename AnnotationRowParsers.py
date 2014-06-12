@@ -6,7 +6,7 @@ import operator
 import scipy.stats
 import pprint
 import collections
-
+import logging
 
 ##############################################################################################################################################################################
 
@@ -160,8 +160,8 @@ class ANNOVARrow():
         self.chrompos = self.chrom +"\t"+ str(self.pos)        
         
         if not header and not filename:
-            print "Can't parse Annovar output without header row (or filename to parse it from)."
-            print "Exiting..."
+            logging.critical( "Can't parse Annovar output without header row (or filename to parse it from)." )
+            logging.critical(  "Exiting..." )
             sys.exit()
         
         if not header: # have to fetch header

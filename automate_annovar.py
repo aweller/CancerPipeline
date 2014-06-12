@@ -14,10 +14,10 @@ def run_annovar(target_folder, target_vcf):
     convert_cmd = """perl %s --format vcf4 %s > %s.annoin""" % (convert2annovar_script, target_folder+target_vcf, target_folder+outfile_name)
     
     if "vcf4old" in convert_cmd:
-        print "Careful! Annoin generation uses --format vcf4old flag!"
+        logging.warning( "Careful! Annoin generation uses --format vcf4old flag!" )
      
     subprocess.call(convert_cmd, shell=True, stdout = open("log_out.txt", "wa"), stderr = open("log_err.txt", "wa"))
-    #print convert_cmd 
+    logging.debug( convert_cmd )
     
     annotate_cmd = """perl %s %s.annoin %s \
                    -buildver hg19 -out %s -remove \

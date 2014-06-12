@@ -16,7 +16,7 @@ def run_vcf2maf(input_vcf):
     output_maf = input_vcf[:-4] + ".maf"
     
     if os.path.exists(target_folder + output_maf):
-        print output_maf, "already present"
+        logging.debug( output_maf, "already present" )
     
     else:
         convert_cmd = "perl %s --input-vcf %s/%s --output-maf %s/%s " % (vcf2maf_script, target_folder, input_vcf, target_folder, output_maf)
@@ -37,13 +37,12 @@ def run_vcf2maf(input_vcf):
         
         sample = input_vcf.strip(".vcf").strip("_T").strip("_N")
         sample = re.sub("_v[1-9]", "", sample) # THIS NEEDS TO BE REMOVE AFTER THE FULL BAM NAMES ARE IMPORTED
-        print "Removing _v[0-9] from sample names in module 'automate_vcf2maf.py'!"
+        logging.warning(  "Removing _v[0-9] from sample names in module 'automate_vcf2maf.py'!" )
 
         tumor_name = sample
         normal_name = sample + "_N"
     
         sed_cmd = "sed -i 's/TUMOR/%s/g' %s/%s" % (tumor_name, target_folder, output_maf)
-        #print sed_cmd
         subprocess.call(sed_cmd, shell = True)
     
         sed_cmd = "sed -i 's/NORMAL/%s/g' %s/%s" % (normal_name, target_folder, output_maf)
@@ -91,7 +90,7 @@ def main():
 
     if cpus == 1:
         for vcf in to_run:
-            print vcf
+            logging.debug( "Converting %s to maf" % vcf)
             run_vcf2maf(vcf)
             
     else:
@@ -102,8 +101,6 @@ def main():
         pool.join()        
         
     unite_mafs()
-    print "Done."
-
 
 ##############################################################################################
 

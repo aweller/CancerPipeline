@@ -1,0 +1,29 @@
+[test_Quasar_A1_VC1_VF01]
+
+root = /home/andreas/bioinfo/core/test_ruffus/data/
+bed = /home/andreas/bioinfo/core/test_ruffus/data/core/roi_148gene_panel_HP.bed
+ref = /home/andreas/bioinfo/core/general/data/hg19.fasta
+raw_vcf_folder = /home/andreas/bioinfo/core/test_ruffus/data/vcfs_A1_VC1_VF00/
+max_snv = 50
+min_cov = 400
+min_varfreq = 0.05
+
+[test_Quasar_A1_VC1_VF02]
+
+root = /home/andreas/bioinfo/core/test_ruffus/data/
+bed = /home/andreas/bioinfo/core/test_ruffus/data/core/roi_148gene_panel_HP.bed
+ref = /home/andreas/bioinfo/core/general/data/hg19.fasta
+raw_vcf_folder = /home/andreas/bioinfo/core/test_ruffus/data/vcfs_A1_VC1_VF00/
+max_snv = 50
+min_cov = 400
+min_varfreq = 0.05
+
+[test_Quasar_A1_VC1_VF02]
+
+root = /home/andreas/bioinfo/core/test_ruffus/data/
+bed = /home/andreas/bioinfo/core/test_ruffus/data/core/roi_148gene_panel_HP.bed
+ref = /home/andreas/bioinfo/core/general/data/hg19.fasta
+raw_vcf_folder = /home/andreas/bioinfo/core/test_ruffus/data/vcfs_A1_VC1_VF00/
+max_snv = 50
+min_cov = 400
+min_varfreq = 0.05
