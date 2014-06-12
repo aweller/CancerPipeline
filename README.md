@@ -59,8 +59,6 @@ CancerPipeline will then create output folders per project for the filtered and 
 File locations and settings per project are saved into a regular text file in Python configuration format (see below).
 The file contains information on each project that was run, serving both as a config file for the current runs and a log file for past runs.
 
-**Location settings**
-
 **Example project definition file**
 
     [myproject]
@@ -75,6 +73,8 @@ The file contains information on each project that was run, serving both as a co
     verbose_logging = False 
     min_cov = 100
     min_varfreq = 0.05
+
+**Location settings**
 
 Use absolute paths!
 
