@@ -29,18 +29,28 @@ touch the files that have **changed** since the last time it was run, not stupid
 The pipeline expects all unfiltered input vcf to be located in one folder.
 
     .
-    └── root  
-        └── vcfs_raw  
+    └── root
+        └── vcfs_raw
+            ├── sample1.vcf
+            └── sample2.vcf
 
 Per pipeline run, it will then create an output folder for the filtered and annotated vcfs and an output folder for the functional analysis tools.
 
     .
-    └── root  
-        ├── analysis_mypipeline  
-        │   ├── input  
-        │   └── output  
-        ├── vcfs_mypipeline  
-        └── vcfs_raw  
+    └── root
+        ├── analysis_mypipeline
+        │   ├── input
+        │   │   └── mypipeline_input.txt
+        │   └── output
+        │       └── mypipeline_sign_genes.txt
+        ├── vcfs_mypipeline
+        │   ├── sample1_annotated.tsv
+        │   ├── sample1.vcf
+        │   ├── sample2_annotated.tsv
+        │   └── sample2.vcf
+        └── vcfs_raw
+            ├── sample1.vcf
+            └── sample2.vcf
 
 File locations and settings per pipeline are saved into a regular text file in Python configuration format (see below).
 The file contains information on each pipeline that was run, serving both as a config file for the current runs and a log file for past runs.
@@ -87,9 +97,9 @@ Use absolute paths!
 
 ##Usage
 
-If there's only one pipeline in the definition file, the only argument needed is the name of file:
+If there's only one pipeline in the definition file, the only argument needed is the name of the file:
 
-    > python CancerPipeline.py 
+    > python CancerPipeline.py pipeline_definitions.txt
 
 If there's more than one pipeline defined, we need to select a pipeline with the 2nd argument::
 
