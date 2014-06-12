@@ -30,7 +30,7 @@ CancerPipeline allows the definition of different **projects**, each with differ
 If new samples arrive, a project can easily be rerun to bring all folders, files and functional analyses for that project up to date.
 In the following examples, our project is called *myproject*.
 
-The pipeline expects all unfiltered input vcf to be located in one folder.
+The pipeline expects all unfiltered input vcf to be located in one folder. Different projects can share the same raw vcf folder.
 
     .
     └── root
