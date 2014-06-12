@@ -3,7 +3,6 @@
 import sys
 import re
 import operator
-import scipy.stats
 import pprint
 import collections
 import logging
