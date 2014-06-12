@@ -105,10 +105,13 @@ class SampleAnnotation():
 
         ######################################################
         # remove intermediate files
-
-        os.remove(target_folder + self.sample + ".hg19_multianno.txt")
-        os.remove(target_folder + self.sample + ".snpeff.vcf")
-        os.remove(target_folder + self.sample + ".annoin")
+        
+        try:
+            os.remove(target_folder + self.sample + ".hg19_multianno.txt")
+            os.remove(target_folder + self.sample + ".snpeff.vcf")
+            os.remove(target_folder + self.sample + ".annoin")
+        except:
+            pass
     
     def print_rows(self):
         vcf_keys, tsv_keys, anno_keys, all_keys = self._get_all_keys()
