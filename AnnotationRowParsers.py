@@ -25,8 +25,7 @@ class VCFrow():
         self.row = row
         self.fields = row.split("\t")
 
-        self.values = {}
-        #self.values = collections.OrderedDict()
+        self.values = collections.OrderedDict()
         self.chrompos = None
         
         if not row[0] == "#":
@@ -115,7 +114,7 @@ xygenase superfamily:pfam.clan_id=CL0029:pfam.id=2OG-FeII_Oxy:pfam.panel=pfam:ph
         
         self.row = row
         self.fields = row.split("\t")
-        self.values = {}
+        self.values = collections.OrderedDict()
         
         if not row[0] == "#":
             self.chrom = "chr" + self.fields[0]
@@ -154,7 +153,7 @@ class ANNOVARrow():
         
         self.row = row
         self.fields = row.split("\t")
-        self.values = {}
+        self.values = collections.OrderedDict()
               
         self.chrom = self.fields[0]
         self.pos = int(self.fields[1])

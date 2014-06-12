@@ -1,3 +1,5 @@
+#!/usr/bin/python2.7
+#
 #CancerPipeline
 #
 #This is the main script that contains the actual pipeline.
