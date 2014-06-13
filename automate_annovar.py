@@ -3,10 +3,6 @@
 # Run AnnoVar
 # Parse and return the output
 
-import getpass
-user = getpass.getuser()
-print "User:", user
-
 import sys
 import os 
 import subprocess

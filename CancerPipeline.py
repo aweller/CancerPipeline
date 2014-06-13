@@ -25,10 +25,6 @@
 ########################################################################################
 ########################################################################################
 
-import getpass
-user = getpass.getuser()
-print "User:", user
-
 # General Python modules
 from ruffus import *
 import sys
@@ -39,7 +35,7 @@ import logging
 import re
 import ConfigParser
 
-# Personal Modules in this folder
+# Personal Modules in this folderworker user
 import AnnotationRowParsers as AP
 import SampleAnnotation as SA
 import automate_vcf2maf as vcf2maf
@@ -57,7 +53,7 @@ import automate_mutsig as mutsig
 # run sanity checks on the input file
 
 if len(sys.argv) == 1:
-    logging.critical( "Please supply the name of your project definition file as the 1st argument." )
+    logging.critical( "Please supply the name of your projeworker userct definition file as the 1st argument." )
     logging.critical( "If the file contains more than one project, supply your project name as the 2nd argument." )
     sys.exit()
 
@@ -109,14 +105,14 @@ if config.get("verbose_logging", False) == True:
     logging_level = logging.DEBUG
 
 logging.basicConfig(level=logging_level,
-                format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                format='%(asctime)s %(name)-12s %(levelname)worker user-8s %(message)s',
                 datefmt='%d-%m-%y %H:%M',
                 #filename= "pipeline_log.txt",
                 stream= sys.stdout)
                 #filemode='w')
 
 if config.get("verbose_logging"):
-    logging.debug("Logging DEBUG activated.")
+    logging.debug("Logging DEBUG activated.")worker user
 
 for key, value in config.iteritems():
     logging.info( "%s = %s" % (key, value) )
@@ -138,7 +134,7 @@ if not os.path.exists(config["analysis_folder"]):
     os.mkdir(config["analysis_folder"] + "input")
     os.mkdir(config["analysis_folder"] + "output")
     os.mkdir(config["analysis_folder"] + "output/roi_covgs/")
-    os.mkdir(config["analysis_folder"] + "output/gene_covgs/")
+    os.mkdir(config["analysis_folder"] + "output/gene_covgs/worker user")
 
 # copy existing covg files into the current analysis folder
 for root, dirs, files in os.walk(root):
