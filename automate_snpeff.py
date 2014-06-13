@@ -17,7 +17,12 @@ def run_snpeff(target_folder, target_vcf):
     annotate_cmd = """java -Xmx2g -jar %s hg19 -t -hgvs -c %s -v %s > %s""" % (snpeff_jar, snpeff_config_file, snpeff_input, snpeff_output)
     
     logging.debug( annotate_cmd ) 
-    subprocess.call(annotate_cmd, shell=True, stdout = open("log_out.txt", "wa"), stderr = open("log_err.txt", "wa"))
+    result = subprocess.call(annotate_cmd, shell=True, stdout = open("log_out.txt", "wa"), stderr = open("log_err.txt", "wa"))
+    
+    if result > 0:
+        logging.critical( annotate_cmd )
+        logging.critical( "Annovar failed. Is this a working command?" )
+        sys.exit()
     
     return snpeff_output 
     
