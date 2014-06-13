@@ -25,6 +25,10 @@
 ########################################################################################
 ########################################################################################
 
+import getpass
+user = getpass.getuser()
+print "User:", user
+
 # General Python modules
 from ruffus import *
 import sys
